@@ -1,74 +1,59 @@
 syntax = "proto3";
 
-package api;
+package countries;
 
-// Сервис gRPC для получения информации по странам.
-service Countries {
+option go_package = "api";
 
-  // запрос на получение списка стран
-  rpc List(Request.Country.List) returns (Response.Country.List) {}
-  
-  // запрос на лайк или дислайк конкретной страны с возможностью потоковой отсылки новых лайков 
-  // и дислайков для разных стран
-  rpc LikeDislike(stream Request.Country.LikeDislike) returns (Response.Country.Single) {}
-  
-  // запрос на потоковое получение текущей страны
-  rpc Single(Request.Country.Single) returns (stream Response.Country.Single) {}
+service CountriesRepository {
+  rpc Single(CountriesRepositoryRequest.Country.Single) returns (CountriesRepositoryResponse.Country.Single) {}
+
+  rpc List(CountriesRepositoryRequest.Country.List) returns (CountriesRepositoryResponse.Country.List) {}
+
+  rpc Like(CountriesRepositoryRequest.Country.Like) returns (CountriesRepositoryResponse.Country.Single) {}
+
+  rpc Dislike(CountriesRepositoryRequest.Country.Dislike) returns (CountriesRepositoryResponse.Country.Single) {}
 }
 
-// namespace ответов
-message Response {
+message CountriesRepositoryResponse {
 
-  // namespace ответов по стране
   message Country {
-  
-    // данные по одной стране
+
     message Single {
-      uint32 id = 1; // id страны
-      string name = 2; // имя страны
-      int32 likes = 3; // количество лайков
+      uint32 id = 1;
+      string name = 2;
+      int32 likes = 3;
     }
-    
-    // данные по нескольким странам
+
     message List {
-      repeated Response.Country.Single countries = 1; // страны
+      message Meta {
+        uint32 offset = 1;
+        uint32 limit = 2;
+      }
+      Meta meta = 1;
+      repeated CountriesRepositoryResponse.Country.Single countries = 2;
     }
   }
 }
 
-// namesapce запросов
-message Request {
+message CountriesRepositoryRequest {
 
-  // namespace запросов для стран
   message Country {
-  
-    // параметры запроса списка стран
+
     message List {
-      uint32 offset = 1;  // отступ в количестве стран, с которого необходимо начать возвращать результат
-      uint32 limit = 2; // количеств стран, которое необходимо вернуть
-    }
-    
-    // параметры запроса лайка страны
-    message Like {
-      uint32 id = 1; // id страны
-    }
-    
-    // параметры запроса дислайка страны
-    message Dislike {
-      uint32 id = 1; // id страны
-    }
-    
-    // параметры запроса для лайка или дислайка страны
-    message LikeDislike {
-      oneof action {  // лайк или дислайк
-        Like like = 1;
-        Dislike dislike = 2;
-      }
+      uint32 offset = 1;
+      uint32 limit = 2;
     }
 
-    // данные по одной стране
+    message Like {
+      uint32 id = 1;
+    }
+
+    message Dislike {
+      uint32 id = 1;
+    }
+
     message Single {
-      uint32 id = 1; // id страны
+      uint32 id = 1;
     }
   }
 }

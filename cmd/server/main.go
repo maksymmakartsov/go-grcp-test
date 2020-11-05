@@ -1,25 +1,31 @@
 package main
 
 import (
-	"go-grcp-test/pkg/api"
-	"go-grcp-test/pkg/countries"
+	"flag"
+	"go-grcp-test/internal/app/countries/countriesserver"
 	"log"
-	"net"
 
-	"google.golang.org/grpc"
+	"github.com/BurntSushi/toml"
 )
 
-func main() {
-	s := grpc.NewServer()
-	srv := &countries.GRPCServer{}
-	api.RegisterCountriesServer(s, srv)
+var (
+	configPath string
+)
 
-	l, err := net.Listen("tcp", ":8080")
+func init() {
+	flag.StringVar(&configPath, "config-path", "configs/countries-server.toml", "path to config file")
+}
+
+func main() {
+	flag.Parse()
+
+	config := countriesserver.NewConfig()
+	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := s.Serve(l); err != nil {
+	if err := countriesserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
 }
