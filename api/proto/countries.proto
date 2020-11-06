@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package countries;
 
-option go_package = "api";
+option go_package = ".;api";
 
 service CountriesRepository {
   rpc Single(CountriesRepositoryRequest.Country.Single) returns (CountriesRepositoryResponse.Country.Single) {}

@@ -11,9 +11,9 @@ mkdir -p tmp/pid
 export PG_USER=postgres
 export PG_PASS=postgres
 export PG_DB_NAME=countries_grpc
-export PG_FIXTURES=third-party/fixtures
+export PG_FIXTURES=third_party/fixtures
 
 ./bin/init-db.sh
 
-./bin/out/server &
+./build/package/server &
 echo $! >tmp/pid/server.pid
